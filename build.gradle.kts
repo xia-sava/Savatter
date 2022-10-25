@@ -1,9 +1,12 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.util.*
 
 plugins {
     kotlin("multiplatform") version "1.7.20"
     id("org.jetbrains.compose") version "1.2.0"
     id("com.squareup.sqldelight") version "1.5.4"
+    id("com.codingfeline.buildkonfig") version "0.13.3"
 }
 
 group = "to.sava.savatter"
@@ -55,5 +58,32 @@ compose.desktop {
 sqldelight {
     database("Storage") {
         packageName = "to.sava.savatter"
+    }
+}
+
+buildkonfig {
+    packageName = "to.sava.savatter.config"
+
+    defaultConfigs {
+        val props = Properties().apply {
+            project.rootProject.file("local.properties").let {
+                if (it.exists()) {
+                    load(it.inputStream())
+                }
+            }
+        }
+        for (key in listOf(
+            "twitterConsumerKey",
+            "twitterConsumerSecret",
+            "twitterClientId",
+            "twitterClientSecret",
+        )) {
+            buildConfigField(FieldSpec.Type.STRING, key, props.getProperty(key, key))
+        }
+    }
+    targetConfigs {
+        create("jvm") {
+            buildConfigField(FieldSpec.Type.STRING, "hogeName2", "jvm")
+        }
     }
 }
