@@ -32,12 +32,13 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 implementation(compose.materialIconsExtended)
                 implementation(compose.uiTooling)
-                implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
                 implementation(kotlin("stdlib-jdk8"))
 
                 implementation("net.harawata:appdirs:1.2.1")
                 implementation("com.squareup.sqldelight:sqlite-driver:1.5.4")
                 implementation("com.squareup.sqldelight:coroutines-extensions:1.5.4")
+
+                implementation("io.insert-koin:koin-core:3.2.2")
             }
         }
         val jvmTest by getting
@@ -46,7 +47,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "to.sava.savatter.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Msi)
             packageName = "Savatter"
@@ -57,7 +58,7 @@ compose.desktop {
 
 sqldelight {
     database("Storage") {
-        packageName = "to.sava.savatter"
+        packageName = "to.sava.savatter.database"
     }
 }
 
