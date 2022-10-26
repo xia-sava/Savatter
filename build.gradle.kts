@@ -33,12 +33,16 @@ kotlin {
                 implementation(compose.materialIconsExtended)
                 implementation(compose.uiTooling)
                 implementation(kotlin("stdlib-jdk8"))
+                implementation("androidx.compose.material:material-icons-extended:1.2.0")
 
                 implementation("net.harawata:appdirs:1.2.1")
                 implementation("com.squareup.sqldelight:sqlite-driver:1.5.4")
                 implementation("com.squareup.sqldelight:coroutines-extensions:1.5.4")
 
                 implementation("io.insert-koin:koin-core:3.2.2")
+
+                implementation("org.twitter4j:twitter4j-core:4.1.1")
+                implementation("io.github.takke:jp.takke.twitter4j-v2:1.4.0")
             }
         }
         val jvmTest by getting

@@ -4,9 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +23,13 @@ fun MainWindow(
     val count by viewModel.count().collectAsState(-1)
     val items by viewModel.selectAll().collectAsState(listOf())
 
+    val oAuthProgress by viewModel.oAuthProgress.collectAsState(false)
+    var oAuthPIN by remember { mutableStateOf("") }
+    val twitterUserId by viewModel.twitterUserId.collectAsState(0L)
+    val twitterScreenName by viewModel.twitterScreenName.collectAsState("screen name")
+    val twitterAccessToken by viewModel.twitterAccessToken.collectAsState("access token")
+    val twitterAccessTokenSecret by viewModel.twitterAccessTokenSecret.collectAsState("access token secret")
+
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -35,7 +40,49 @@ fun MainWindow(
                 viewModel.twitterOAuth()
             },
         ) {
-            Text("OAuth2")
+            if (oAuthProgress) {
+                CircularProgressIndicator(color = MaterialTheme.colors.onPrimary)
+            } else {
+                Text("OAuth2")
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Row {
+            TextField(
+                value = oAuthPIN,
+                onValueChange = {
+                    oAuthPIN = it
+                },
+                label = { Text("PIN") },
+            )
+            Button(
+                onClick = {
+                    viewModel.twitterOAuthPIN(oAuthPIN)
+                },
+            ) {
+                Text("Submit PIN")
+            }
+        }
+        Row {
+            Text(
+                if (twitterUserId == 0L) "user id" else twitterUserId.toString(),
+                modifier = Modifier.border(1.dp, Color.Black).padding(8.dp),
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                twitterScreenName,
+                modifier = Modifier.border(1.dp, Color.Black).padding(8.dp),
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                twitterAccessToken,
+                modifier = Modifier.border(1.dp, Color.Black).padding(8.dp),
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                twitterAccessTokenSecret,
+                modifier = Modifier.border(1.dp, Color.Black).padding(8.dp),
+            )
         }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
