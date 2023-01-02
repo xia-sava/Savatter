@@ -4,6 +4,7 @@ import java.util.*
 
 plugins {
     kotlin("multiplatform") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
     id("org.jetbrains.compose") version "1.2.0"
     id("com.squareup.sqldelight") version "1.5.4"
     id("com.codingfeline.buildkonfig") version "0.13.3"
@@ -33,6 +34,8 @@ kotlin {
                 implementation(compose.materialIconsExtended)
                 implementation(compose.uiTooling)
                 implementation(kotlin("stdlib-jdk8"))
+                implementation("com.google.devtools.ksp:symbol-processing-api:1.7.20-1.0.6")
+
                 implementation("androidx.compose.material:material-icons-extended:1.2.0")
 
                 implementation("net.harawata:appdirs:1.2.1")
@@ -40,6 +43,14 @@ kotlin {
                 implementation("com.squareup.sqldelight:coroutines-extensions:1.5.4")
 
                 implementation("io.insert-koin:koin-core:3.2.2")
+                implementation("io.ktor:ktor-client-core:2.2.1")
+                implementation("io.ktor:ktor-client-cio:2.2.1")
+                implementation("io.ktor:ktor-client-content-negotiation:2.2.1")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.1")
+
+                implementation("io.ktor:ktor-server-core:2.2.1")
+                implementation("io.ktor:ktor-server-cio:2.2.1")
+                implementation("io.ktor:ktor-html-builder:1.6.8")
 
                 implementation("org.twitter4j:twitter4j-core:4.1.1")
                 implementation("io.github.takke:jp.takke.twitter4j-v2:1.4.0")

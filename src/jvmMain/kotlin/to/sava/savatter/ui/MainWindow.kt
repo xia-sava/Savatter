@@ -43,7 +43,7 @@ fun MainWindow(
             if (oAuthProgress) {
                 CircularProgressIndicator(color = MaterialTheme.colors.onPrimary)
             } else {
-                Text("OAuth2")
+                Text("OAuth")
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -84,7 +84,23 @@ fun MainWindow(
                 modifier = Modifier.border(1.dp, Color.Black).padding(8.dp),
             )
         }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                viewModel.twitterOAuth2()
+            },
+        ) {
+            if (oAuthProgress) {
+                CircularProgressIndicator(color = MaterialTheme.colors.onPrimary)
+            } else {
+                Text("OAuth2")
+            }
+        }
         Spacer(modifier = Modifier.height(4.dp))
+
+
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             modifier = Modifier.border(1.dp, Color.Black).padding(8.dp),
             text = count.toString(),
