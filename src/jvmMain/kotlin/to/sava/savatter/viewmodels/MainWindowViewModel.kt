@@ -34,8 +34,13 @@ import kotlinx.serialization.json.Json
 import to.sava.savatter.config.BuildKonfig
 import to.sava.savatter.data.TextTest
 import to.sava.savatter.database.Storage
-import twitter4j.OAuthAuthorization
-import twitter4j.RequestToken
+import twitter4j.OAuth2TokenProvider
+import twitter4j.TwitterFactory
+import twitter4j.auth.AuthorizationFactory
+import twitter4j.auth.OAuthAuthorization
+import twitter4j.auth.RequestToken
+import twitter4j.conf.ConfigurationBuilder
+import twitter4j.v2
 import java.awt.Desktop
 import java.net.URI
 import java.security.MessageDigest
@@ -55,15 +60,24 @@ class MainWindowViewModel(
 
     private val queries = storage.textTestQueries
 
-    private val twitterOAuth = OAuthAuthorization.newBuilder()
-        .prettyDebugEnabled(true)
-        .oAuthConsumer(BuildKonfig.twitterConsumerKey, BuildKonfig.twitterConsumerSecret)
+    private val twitterV1Config = ConfigurationBuilder()
+        .setPrettyDebugEnabled(true)
+        .setOAuthConsumerKey(BuildKonfig.twitterConsumerKey)
+        .setOAuthConsumerSecret(BuildKonfig.twitterConsumerSecret)
         .build()
+    private val twitterOAuth = OAuthAuthorization(twitterV1Config)
+
     private var oAuthRequestToken: RequestToken? = null
     val twitterUserId = MutableStateFlow(0L)
     val twitterScreenName = MutableStateFlow("screen name")
     val twitterAccessToken = MutableStateFlow("access token")
     val twitterAccessTokenSecret = MutableStateFlow("access token secret")
+    val twitterPersonalToken = MutableStateFlow("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+
+    private var _fetchProgress = MutableStateFlow(false)
+    val fetchProgress = _fetchProgress.asStateFlow()
+
+    val twitterTimeline = MutableStateFlow(listOf<String>())
 
     fun twitterOAuth() {
         _oAuthProgress.value = true
@@ -101,6 +115,78 @@ class MainWindowViewModel(
     }
 
     fun twitterOAuth2() {
+        _oAuthProgress.value = true
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val oauth2CallbackServer =
+                embeddedServer(serverCIO, port = 56764, module = Application::oauth2CallbackServer)
+            val codeVerify = nextBytes(32).encodeUrlSafeBase64()
+            val state = "state" // nextBytes(80).encodeUrlSafeBase64()
+            val redirectUri = "http://127.0.0.1:56764/oauth2_callback"
+
+            val oauth2 = OAuth2TokenProvider(twitterV1Config)
+            Desktop.getDesktop().browse(
+                URI.create(oauth2.createAuthorizeUrl(
+                    BuildKonfig.twitterClientId,
+                    redirectUri,
+                    arrayOf("tweet.read", "tweet.write", "users.read", "offline.access"),
+                    codeVerify,
+                ))
+            )
+            oauth2CallbackServer.start()
+            val job = viewModelScope.launch(Dispatchers.IO) {
+                val (rState, code) = oauth2CallbackServerChannel.receive()
+                if (rState == state && code != null) {
+                    val result = oauth2.getAccessToken(
+                        BuildKonfig.twitterClientId,
+                        redirectUri,
+                        code,
+                        codeVerify,
+                    )
+                    if (result != null) {
+                        twitterPersonalToken.value = result.accessToken
+                    }
+
+                }
+            }
+            job.invokeOnCompletion {
+                oauth2CallbackServer.stop()
+                _oAuthProgress.value = false
+            }
+        }
+    }
+
+    fun twitterFetchTimeline() {
+        _fetchProgress.value = true
+        val conf1 = ConfigurationBuilder()
+            .setPrettyDebugEnabled(true)
+            .setOAuthConsumerKey(BuildKonfig.twitterConsumerKey)
+            .setOAuthConsumerSecret(BuildKonfig.twitterConsumerSecret)
+            .setOAuthAccessToken("00000000-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+            .setOAuthAccessTokenSecret("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+            .build()
+
+        val conf2 = ConfigurationBuilder()
+            .setPrettyDebugEnabled(true)
+            .setOAuthConsumerKey(BuildKonfig.twitterConsumerKey)
+            .setOAuthConsumerSecret(BuildKonfig.twitterConsumerSecret)
+            .setOAuth2AccessToken(twitterPersonalToken.value)
+            .setOAuth2TokenType("bearer")
+            .setApplicationOnlyAuthEnabled(true)
+            .build()
+        val auth1 = AuthorizationFactory.getInstance(conf1)
+        val auth2 = AuthorizationFactory.getInstance(conf2)
+
+        val twitter1 = TwitterFactory(conf1).getInstance(auth1)
+        val twitter2 = TwitterFactory(conf2).getInstance(auth2)
+        val user = twitter1.verifyCredentials()
+        val list = twitter2.v2.getReverseChronologicalTimeline(user.id)
+        twitterTimeline.value = list.tweets.map { it.text }
+
+        _fetchProgress.value = false
+    }
+
+    fun twitterOAuth2Manually() {
         _oAuthProgress.value = true
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -177,31 +263,32 @@ data class TokenCallback(
     @SerialName("refresh_token") val refreshToken: String,
 )
 
-fun Application.oauth2CallbackServer() {
-    routing {
-        get("/oauth2_callback") {
-            val params = call.request.queryParameters
+    fun Application.oauth2CallbackServer() {
+        routing {
+            get("/oauth2_callback") {
+                val params = call.request.queryParameters
 
-            MainWindowViewModel.oauth2CallbackServerChannel.send(
-                OAuth2Callback(params["state"], params["code"])
-            )
+                MainWindowViewModel.oauth2CallbackServerChannel.send(
+                    OAuth2Callback(params["state"], params["code"])
+                )
 
-            call.respondText(
-                buildString {
-                    appendHTML().html {
-                        body {
-                            button {
-                                text("close")
-                                onClick = "alert(1); window.close()"
+                call.respondText(
+                    buildString {
+                        appendHTML().html {
+                            body {
+                                text("とじる")
+                                button {
+                                    text("close")
+                                    onClick = "alert(1); window.close()"
+                                }
                             }
                         }
-                    }
-                },
-                ContentType.Text.Html,
-            )
+                    },
+                    ContentType.Text.Html,
+                )
+            }
         }
     }
-}
 
 fun ByteArray.encodeUrlSafeBase64(): String =
     Base64.getUrlEncoder().withoutPadding().encodeToString(this)

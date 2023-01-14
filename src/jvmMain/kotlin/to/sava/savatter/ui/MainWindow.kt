@@ -24,11 +24,15 @@ fun MainWindow(
     val items by viewModel.selectAll().collectAsState(listOf())
 
     val oAuthProgress by viewModel.oAuthProgress.collectAsState(false)
+    val fetchProgress by viewModel.fetchProgress.collectAsState(false)
     var oAuthPIN by remember { mutableStateOf("") }
     val twitterUserId by viewModel.twitterUserId.collectAsState(0L)
     val twitterScreenName by viewModel.twitterScreenName.collectAsState("screen name")
     val twitterAccessToken by viewModel.twitterAccessToken.collectAsState("access token")
     val twitterAccessTokenSecret by viewModel.twitterAccessTokenSecret.collectAsState("access token secret")
+    val twitterPersonalToken by viewModel.twitterPersonalToken.collectAsState("personal token")
+
+    val twitterTimeline by viewModel.twitterTimeline.collectAsState(listOf("--empty--"))
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -85,27 +89,55 @@ fun MainWindow(
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
+        Divider(color = Color.Black)
 
-        Button(
-            onClick = {
-                viewModel.twitterOAuth2()
-            },
-        ) {
-            if (oAuthProgress) {
-                CircularProgressIndicator(color = MaterialTheme.colors.onPrimary)
-            } else {
-                Text("OAuth2")
+        Column {
+            Button(
+                onClick = {
+                    viewModel.twitterOAuth2()
+                },
+            ) {
+                if (oAuthProgress) {
+                    CircularProgressIndicator(color = MaterialTheme.colors.onPrimary)
+                } else {
+                    Text("OAuth2")
+                }
+            }
+            Spacer(Modifier.width(4.dp))
+            Text(
+                twitterPersonalToken,
+                modifier = Modifier.border(1.dp, Color.Black).padding(8.dp),
+            )
+            Spacer(Modifier.width(4.dp))
+            Button(
+                onClick = {
+                    viewModel.twitterFetchTimeline()
+                },
+            ) {
+                if (fetchProgress) {
+                    CircularProgressIndicator(color = MaterialTheme.colors.onPrimary)
+                } else {
+                    Text("fetch Timeline")
+                }
+            }
+            Spacer(Modifier.width(4.dp))
+            LazyColumn {
+                items(twitterTimeline) {
+                    Text(text = it)
+                    Divider(color = Color.Gray)
+                }
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
 
+        Divider(color = Color.Black)
 
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             modifier = Modifier.border(1.dp, Color.Black).padding(8.dp),
             text = count.toString(),
         )
-        LazyColumn() {
+        LazyColumn {
             items(items) {
                 Text(text = "${it.text1} / ${it.text2}")
                 Divider(color = Color.Gray)

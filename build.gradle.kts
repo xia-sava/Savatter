@@ -36,7 +36,7 @@ kotlin {
                 implementation(kotlin("stdlib-jdk8"))
                 implementation("com.google.devtools.ksp:symbol-processing-api:1.7.20-1.0.6")
 
-                implementation("androidx.compose.material:material-icons-extended:1.2.0")
+                implementation("androidx.compose.material:material-icons-extended:1.3.1")
 
                 implementation("net.harawata:appdirs:1.2.1")
                 implementation("com.squareup.sqldelight:sqlite-driver:1.5.4")
@@ -52,7 +52,7 @@ kotlin {
                 implementation("io.ktor:ktor-server-cio:2.2.1")
                 implementation("io.ktor:ktor-html-builder:1.6.8")
 
-                implementation("org.twitter4j:twitter4j-core:4.1.1")
+                implementation("org.twitter4j:twitter4j-core:4.0.7")
                 implementation("io.github.takke:jp.takke.twitter4j-v2:1.4.0")
             }
         }
