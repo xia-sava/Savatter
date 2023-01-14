@@ -7,7 +7,7 @@ import androidx.compose.ui.window.application
 import org.koin.core.context.startKoin
 import to.sava.savatter.di.appModule
 import to.sava.savatter.di.getF
-import to.sava.savatter.ui.MainWindow
+import to.sava.savatter.ui.StudyWindow
 
 fun main() = application {
     startKoin {
@@ -22,6 +22,6 @@ fun main() = application {
 @Composable
 fun App() {
     MaterialTheme {
-        MainWindow(getF())
+        StudyWindow(getF())
     }
 }

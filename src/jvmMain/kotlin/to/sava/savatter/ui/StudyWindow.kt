@@ -10,11 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import to.sava.savatter.viewmodels.MainWindowViewModel
+import to.sava.savatter.viewmodels.StudyWindowViewModel
 
 @Composable
-fun MainWindow(
-    viewModel: MainWindowViewModel,
+fun StudyWindow(
+    viewModel: StudyWindowViewModel,
     modifier: Modifier = Modifier,
 ) {
     viewModel.bindScope(rememberCoroutineScope())

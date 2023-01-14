@@ -50,7 +50,7 @@ import io.ktor.client.engine.cio.CIO as clientCIO
 import io.ktor.server.cio.CIO as serverCIO
 
 
-class MainWindowViewModel(
+class StudyWindowViewModel(
     private val storageDriver: SqlDriver,
     private val storage: Storage,
 ) : ViewModelBase() {
@@ -268,7 +268,7 @@ data class TokenCallback(
             get("/oauth2_callback") {
                 val params = call.request.queryParameters
 
-                MainWindowViewModel.oauth2CallbackServerChannel.send(
+                StudyWindowViewModel.oauth2CallbackServerChannel.send(
                     OAuth2Callback(params["state"], params["code"])
                 )
 

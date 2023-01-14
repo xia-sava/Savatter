@@ -4,7 +4,7 @@ import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import org.koin.dsl.module
 import to.sava.savatter.database.Storage
-import to.sava.savatter.viewmodels.MainWindowViewModel
+import to.sava.savatter.viewmodels.StudyWindowViewModel
 
 
 fun appModule() = module {
@@ -13,5 +13,5 @@ fun appModule() = module {
         Storage.Schema.create(get())
         Storage(get())
     }
-    factory { MainWindowViewModel(get(), get()) }
+    factory { StudyWindowViewModel(get(), get()) }
 }
