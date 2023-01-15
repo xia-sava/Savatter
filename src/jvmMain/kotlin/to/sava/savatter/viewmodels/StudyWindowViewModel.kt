@@ -32,7 +32,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import to.sava.savatter.config.BuildKonfig
-import to.sava.savatter.data.TextTest
+import to.sava.savatter.database.Account
 import to.sava.savatter.database.Storage
 import twitter4j.OAuth2TokenProvider
 import twitter4j.TwitterFactory
@@ -58,7 +58,7 @@ class StudyWindowViewModel(
     private var _oAuthProgress = MutableStateFlow(false)
     val oAuthProgress = _oAuthProgress.asStateFlow()
 
-    private val queries = storage.textTestQueries
+    private val queries = storage.accountQueries
 
     private val twitterV1Config = ConfigurationBuilder()
         .setPrettyDebugEnabled(true)
@@ -110,7 +110,7 @@ class StudyWindowViewModel(
         queries.insert(text1, text2)
     }
 
-    fun selectAll(): Flow<List<TextTest>> {
+    fun selectAll(): Flow<List<Account>> {
         return queries.selectAll().asFlow().mapToList(Dispatchers.IO)
     }
 

@@ -139,7 +139,7 @@ fun StudyWindow(
         )
         LazyColumn {
             items(items) {
-                Text(text = "${it.text1} / ${it.text2}")
+                Text(text = "${it.key} / ${it.data_}")
                 Divider(color = Color.Gray)
             }
         }

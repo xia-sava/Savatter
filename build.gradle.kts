@@ -54,6 +54,8 @@ kotlin {
 
                 implementation("org.twitter4j:twitter4j-core:4.0.7")
                 implementation("io.github.takke:jp.takke.twitter4j-v2:1.4.0")
+
+                implementation("app.softwork:routing-compose:0.2.10")
             }
         }
         val jvmTest by getting
@@ -74,6 +76,7 @@ compose.desktop {
 sqldelight {
     database("Storage") {
         packageName = "to.sava.savatter.database"
+        dialect = "sqlite:3.24"
     }
 }
 

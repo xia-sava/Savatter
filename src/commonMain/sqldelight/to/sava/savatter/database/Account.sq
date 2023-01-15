@@ -1,0 +1,23 @@
+CREATE TABLE account (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  key TEXT NOT NULL DEFAULT '0',
+  data TEXT NOT NULL DEFAULT ''
+);
+
+selectAll:
+SELECT * FROM account ORDER BY key ASC;
+
+deleteAll:
+DELETE FROM account;
+
+insert:
+INSERT INTO account (key, data) VALUES (:key, :value);
+
+update:
+UPDATE account SET data = :value WHERE key = :key;
+
+delete:
+DELETE FROM account WHERE key = :key;
+
+count:
+SELECT COUNT(id) FROM account;
